@@ -12,9 +12,9 @@
 # Copyright 2013 Mickaël Canévet, unless otherwise noted.
 #
 class btsync::repo {
-  include ::apt
   case $::operatingsystem {
     Debian: {
+      include ::apt
       apt::source { 'btsync':
         location          => 'http://debian.yeasoft.net/btsync',
         release           => $::lsbdistcodename,
@@ -26,7 +26,17 @@ class btsync::repo {
       }
     }
     'Ubuntu': {
+      include ::apt
       apt::ppa { 'ppa:tuxpoldo/btsync': }
+    }
+    'Centos','Amazon': {
+      # https://www.resilio.com/blog/official-linux-packages-for-sync-now-available
+      yumrepo {'btsync':
+        enabled => 1,
+        descr   => 'BitTorrent Sync $basearch',
+        baseurl => 'http://linux-packages.getsync.com/btsync/rpm/$basearch',
+        gpgcheck => 0,
+      }
     }
     default: {
       fail "Unsupported Operating System: ${::operatingsystem}"
